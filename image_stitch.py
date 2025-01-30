@@ -46,13 +46,17 @@ def ex_extract_and_match_feature(img_1, img_2, ratio_robustness=0.7):
         ssd = []
         for f2 in range(desc2.shape[0]):
             diff = desc1[f1] - desc2[f2]
-            ssd.append(np.sqrt(np.dot(diff, diff)))
+            ssd.append((f2, np.sqrt(np.dot(diff, diff))))
 
-        ssd.sort()
+        sorted_ssd = sorted(ssd, key=lambda x: x[1])
+
+        d1 = sorted_ssd[0][1]
+        d2 = sorted_ssd[1][1]
         
-        if ssd[0]/ssd[1] <= ratio_robustness:
-            x, y = kp1[f1].pt
-            list_pairs_matched_keypoints.append([x, y])
+        if d1/d2 <= ratio_robustness:
+            x1, y1 = kp1[f1].pt
+            x2, y2 = kp2[sorted_ssd[0][0]].pt
+            list_pairs_matched_keypoints.append([[x1, y1], [x2, y2]])
 
     return list_pairs_matched_keypoints
 
